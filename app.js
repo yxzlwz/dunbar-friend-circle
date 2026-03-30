@@ -117,8 +117,9 @@ function renderStats() {
 
   const family   = friends.filter(f => f.isFamily).length;
   const sameCity = friends.filter(f => f.sameCity).length;
-  const male     = friends.filter(f => f.gender === 'male').length;
-  const female   = friends.filter(f => f.gender === 'female').length;
+  const male      = friends.filter(f => f.gender === 'male').length;
+  const female    = friends.filter(f => f.gender === 'female').length;
+  const nonbinary = friends.filter(f => f.gender === 'nonbinary').length;
 
   const pct = n => total ? Math.round(n / total * 100) : 0;
 
@@ -168,6 +169,7 @@ function renderStats() {
 
     ${statRow('Male', male, ` (${pct(male)}%)`)}
     ${statRow('Female', female, ` (${pct(female)}%)`)}
+    ${nonbinary ? statRow('Non-binary', nonbinary, ` (${pct(nonbinary)}%)`) : ''}
     ${bar(male, total, '#4A90D9')}
 
     ${avgYears !== null ? statRow('Avg. years known', avgYears + ' yrs') : ''}
@@ -427,10 +429,11 @@ function buildFriendNode(f, fx, fy, cx, cy, radii) {
   const tagY = fy - tagH / 2;
 
   const isMale = f.gender === 'male';
-  const fillColor = isMale ? 'rgba(74,144,217,0.13)' : 'rgba(232,126,161,0.13)';
-  const borderColor = isMale ? '#4A90D9' : '#E87EA1';
+  const isNonBinary = f.gender === 'nonbinary';
+  const fillColor = isMale ? 'rgba(74,144,217,0.13)' : isNonBinary ? 'rgba(155,114,207,0.13)' : 'rgba(232,126,161,0.13)';
+  const borderColor = isMale ? '#4A90D9' : isNonBinary ? '#9B72CF' : '#E87EA1';
   const borderWidth = '1.8';
-  const textColor = isMale ? '#1a5fa8' : '#b83870';
+  const textColor = isMale ? '#1a5fa8' : isNonBinary ? '#6a3fa8' : '#b83870';
 
   // Drop shadow filter
   const filterId = `shadow-${f.id}`;
