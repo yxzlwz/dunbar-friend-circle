@@ -109,6 +109,71 @@ function renderList() {
   });
 }
 
+function renderStats() {
+  const panel = document.getElementById('stats-panel');
+  if (!panel) return;
+  const total = friends.length;
+  if (total === 0) { panel.innerHTML = ''; return; }
+
+  const family   = friends.filter(f => f.isFamily).length;
+  const sameCity = friends.filter(f => f.sameCity).length;
+  const male     = friends.filter(f => f.gender === 'male').length;
+  const female   = friends.filter(f => f.gender === 'female').length;
+
+  const pct = n => total ? Math.round(n / total * 100) : 0;
+
+  const avgYears = (() => {
+    const known = friends.filter(f => f.yearMet);
+    if (!known.length) return null;
+    return Math.round(known.reduce((s, f) => s + yearsFromMet(f.yearMet), 0) / known.length);
+  })();
+
+  const ringStats = RINGS.map(r => ({
+    label: r.label,
+    count: ringCount(r.id),
+    cap: ringCapacity(r.id),
+  }));
+
+  function statRow(label, value, sub) {
+    return `<div class="stat-row">
+      <span class="stat-label">${label}</span>
+      <span class="stat-value">${value}${sub ? `<span class="stat-sub">${sub}</span>` : ''}</span>
+    </div>`;
+  }
+
+  function bar(n, total, color) {
+    const w = total ? Math.round(n / total * 100) : 0;
+    return `<div class="stat-bar-track"><div class="stat-bar-fill" style="width:${w}%;background:${color}"></div></div>`;
+  }
+
+  panel.innerHTML = `
+    <div class="stats-title">Statistics</div>
+    ${statRow('Total friends', total, ` / 150`)}
+    ${bar(total, 150, '#4A90D9')}
+
+    <div class="stats-divider"></div>
+
+    ${ringStats.map(r =>
+      statRow(r.label, r.count, ` / ${r.cap}`)
+    ).join('')}
+
+    <div class="stats-divider"></div>
+
+    ${statRow('Same city', sameCity, ` (${pct(sameCity)}%)`)}
+    ${bar(sameCity, total, '#e6a817')}
+    ${statRow('Family', family, ` (${pct(family)}%)`)}
+    ${bar(family, total, '#7b5ea7')}
+
+    <div class="stats-divider"></div>
+
+    ${statRow('Male', male, ` (${pct(male)}%)`)}
+    ${statRow('Female', female, ` (${pct(female)}%)`)}
+    ${bar(male, total, '#4A90D9')}
+
+    ${avgYears !== null ? statRow('Avg. years known', avgYears + ' yrs') : ''}
+  `;
+}
+
 function createListItem(f) {
   const item = document.createElement('div');
   item.className = 'friend-item';
@@ -222,7 +287,7 @@ function onListDrop(e) {
     });
   });
 
-  save(); renderList(); renderDiagram();
+  save(); renderList(); renderStats(); renderDiagram();
 }
 
 // ─── SVG Diagram ──────────────────────────────────────────────────────────────
@@ -512,7 +577,7 @@ function startSvgDrag(e, friend, cx, cy, radii) {
         const newRank = nextRankInRing(targetRing.id);
         if (newRank !== null) {
           f.rank = newRank;
-          save(); renderList(); renderDiagram();
+          save(); renderList(); renderStats(); renderDiagram();
           return;
         }
       }
@@ -612,7 +677,7 @@ function importJSON(file) {
       const data = JSON.parse(e.target.result);
       if (!Array.isArray(data)) throw new Error();
       friends = data;
-      save(); renderList(); renderDiagram();
+      save(); renderList(); renderStats(); renderDiagram();
     } catch { alert('Invalid JSON file.'); }
   };
   reader.readAsText(file);
@@ -639,7 +704,7 @@ document.getElementById('btn-delete').addEventListener('click', () => {
   const id = document.getElementById('form-id').value;
   if (!id) return;
   friends = friends.filter(f => f.id !== id);
-  save(); closeModal(); renderList(); renderDiagram();
+  save(); closeModal(); renderList(); renderStats(); renderDiagram();
 });
 
 document.getElementById('friend-form').addEventListener('submit', e => {
@@ -672,7 +737,7 @@ document.getElementById('friend-form').addEventListener('submit', e => {
     friends.push({ id: uid(), name, gender, yearMet, sameCity, isFamily, rank: newRank });
   }
 
-  save(); closeModal(); renderList(); renderDiagram();
+  save(); closeModal(); renderList(); renderStats(); renderDiagram();
 });
 
 let resizeTimer;
@@ -684,4 +749,5 @@ window.addEventListener('resize', () => {
 // ─── Init ─────────────────────────────────────────────────────────────────────
 load();
 renderList();
+renderStats();
 renderDiagram();
