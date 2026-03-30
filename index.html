@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dunbar's Friend Circle</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Toolbar -->
+    <header class="toolbar">
+      <h1>Dunbar's Friend Circle</h1>
+      <div class="toolbar-actions">
+        <button id="btn-add" class="btn btn-primary">+ Add Friend</button>
+        <button id="btn-export" class="btn">Export JSON</button>
+        <label class="btn" for="import-input">Import JSON</label>
+        <input type="file" id="import-input" accept=".json" style="display:none">
+        <button id="btn-reset-zoom" class="btn" title="Reset zoom">⊙ Reset View</button>
+      </div>
+      <div class="legend">
+        <span class="legend-item"><span class="dot male"></span> Male</span>
+        <span class="legend-item"><span class="dot female"></span> Female</span>
+        <span class="legend-item">📍 Same city</span>
+        <span class="legend-item">👨‍👩‍👧 Family</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- Left: Friend List -->
+      <aside class="list-panel">
+        <div id="friend-list"></div>
+      </aside>
+
+      <!-- Right: Diagram -->
+      <section class="diagram-panel">
+        <svg id="diagram" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div id="tooltip" class="tooltip" style="display:none"></div>
+        <div class="zoom-hint">Scroll to zoom · Drag background to pan</div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div id="modal-overlay" class="modal-overlay" style="display:none">
+    <div class="modal">
+      <h2 id="modal-title">Add Friend</h2>
+      <form id="friend-form">
+        <input type="hidden" id="form-id">
+        <div class="form-group">
+          <label for="form-name">Name</label>
+          <input type="text" id="form-name" required placeholder="Friend's name">
+        </div>
+        <div class="form-group">
+          <label for="form-gender">Gender</label>
+          <select id="form-gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="form-year-met">Year We Met</label>
+          <input type="number" id="form-year-met" min="1900" max="2100" placeholder="e.g. 2018">
+          <div class="year-hint" id="year-hint"></div>
+        </div>
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" id="form-city">
+            Same city as me
+          </label>
+        </div>
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" id="form-family">
+            Family
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="form-ring">Ring</label>
+          <select id="form-ring">
+            <option value="1">Intimate (1–5)</option>
+            <option value="2">Support (6–15)</option>
+            <option value="3">Close Friends (16–50)</option>
+            <option value="4" selected>Casual (51–150)</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" id="btn-cancel" class="btn">Cancel</button>
+          <button type="button" id="btn-delete" class="btn btn-danger" style="display:none">Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
