@@ -118,7 +118,8 @@ function renderStats() {
   const family     = friends.filter(f => f.isFamily).length;
   const sameCity   = friends.filter(f => f.sameCity).length;
   const isQueer    = friends.filter(f => f.isQueer).length;
-  const frequentCt = friends.filter(f => f.notFrequentContact === true).length;
+  const frequentCt   = friends.filter(f => f.notFrequentContact === true).length;
+  const isOnlineFriend = friends.filter(f => f.isOnlineFriend).length;
   const male      = friends.filter(f => f.gender === 'male').length;
   const female    = friends.filter(f => f.gender === 'female').length;
   const nonbinary = friends.filter(f => f.gender === 'nonbinary').length;
@@ -170,6 +171,8 @@ function renderStats() {
     ${bar(isQueer, total, '#e079a0')}
     ${statRow('Not frequent contact', frequentCt, ` (${pct(frequentCt)}%)`)}
     ${bar(frequentCt, total, '#3cb371')}
+    ${statRow('Online friend', isOnlineFriend, ` (${pct(isOnlineFriend)}%)`)}
+    ${bar(isOnlineFriend, total, '#6a5acd')}
 
     <div class="stats-divider"></div>
 
@@ -193,7 +196,8 @@ function createListItem(f) {
   const badges = (f.sameCity ? '<span class="city-badge" title="Same city">📍</span>' : '')
                + (f.isFamily ? '<span class="family-badge" title="Family">👨‍👩‍👧</span>' : '')
                + (f.isQueer ? '<span class="queer-badge" title="Queer">🏳️‍🌈</span>' : '')
-               + (f.notFrequentContact === true ? '<span class="frequent-badge" title="Not frequent contact">📵</span>' : '');
+               + (f.notFrequentContact === true ? '<span class="frequent-badge" title="Not frequent contact">📵</span>' : '')
+               + (f.isOnlineFriend ? '<span class="online-badge" title="Online friend">🌐</span>' : '');
 
   item.innerHTML = `
     <div class="friend-avatar ${f.gender} ${cityClass}">${initials}</div>
@@ -608,7 +612,8 @@ function showTooltip(e, f) {
   const family = f.isFamily ? '<div class="t-family">👨‍👩‍👧 Family</div>' : '';
   const queer = f.isQueer ? '<div class="t-queer">🏳️‍🌈 Queer</div>' : '';
   const frequent = f.notFrequentContact === true ? '<div class="t-frequent">📵 Not frequent contact</div>' : '';
-  tip.innerHTML = `<div class="t-name">${escHtml(f.name)}</div>${metYear}${city}${family}${queer}${frequent}`;
+  const onlineFriend = f.isOnlineFriend ? '<div class="t-online">🌐 Online friend</div>' : '';
+  tip.innerHTML = `<div class="t-name">${escHtml(f.name)}</div>${metYear}${city}${family}${queer}${frequent}${onlineFriend}`;
   tip.style.display = 'block';
   moveTooltip(e);
 }
@@ -652,6 +657,7 @@ function openModal(id) {
     document.getElementById('form-family').checked = f.isFamily || false;
     document.getElementById('form-queer').checked = f.isQueer || false;
     document.getElementById('form-notFrequent').checked = f.notFrequentContact || false;
+    document.getElementById('form-online').checked = f.isOnlineFriend || false;
     document.getElementById('form-ring').value = getRing(f.rank).id;
     delBtn.style.display = 'inline-block';
   } else {
@@ -664,6 +670,7 @@ function openModal(id) {
     document.getElementById('form-family').checked = false;
     document.getElementById('form-queer').checked = false;
     document.getElementById('form-notFrequent').checked = false;
+    document.getElementById('form-online').checked = false;
     document.getElementById('form-ring').value = lastUsedRing;
     delBtn.style.display = 'none';
   }
@@ -734,6 +741,7 @@ document.getElementById('friend-form').addEventListener('submit', e => {
   const isFamily = document.getElementById('form-family').checked;
   const isQueer = document.getElementById('form-queer').checked;
   const notFrequentContact = document.getElementById('form-notFrequent').checked;
+  const isOnlineFriend = document.getElementById('form-online').checked;
   const ringId = parseInt(document.getElementById('form-ring').value, 10);
   lastUsedRing = ringId;
 
@@ -743,7 +751,7 @@ document.getElementById('friend-form').addEventListener('submit', e => {
     const f = friends.find(x => x.id === id);
     if (f) {
       const oldRing = getRing(f.rank).id;
-      f.name = name; f.gender = gender; f.yearMet = yearMet; f.sameCity = sameCity; f.isFamily = isFamily; f.isQueer = isQueer; f.notFrequentContact = notFrequentContact;
+      f.name = name; f.gender = gender; f.yearMet = yearMet; f.sameCity = sameCity; f.isFamily = isFamily; f.isQueer = isQueer; f.notFrequentContact = notFrequentContact; f.isOnlineFriend = isOnlineFriend;
       if (oldRing !== ringId) {
         const newRank = nextRankInRing(ringId);
         if (newRank === null) { alert(`Ring is full (max ${ringCapacity(ringId)})`); return; }
@@ -753,7 +761,7 @@ document.getElementById('friend-form').addEventListener('submit', e => {
   } else {
     const newRank = nextRankInRing(ringId);
     if (newRank === null) { alert(`Ring is full (max ${ringCapacity(ringId)})`); return; }
-    friends.push({ id: uid(), name, gender, yearMet, sameCity, isFamily, isQueer, notFrequentContact, rank: newRank });
+    friends.push({ id: uid(), name, gender, yearMet, sameCity, isFamily, isQueer, notFrequentContact, isOnlineFriend, rank: newRank });
   }
 
   save(); closeModal(); renderList(); renderStats(); renderDiagram();
