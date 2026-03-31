@@ -153,7 +153,7 @@ body {
   margin-top: 1px;
 }
 
-.city-badge, .family-badge {
+.city-badge, .family-badge, .queer-badge, .frequent-badge {
   font-size: 0.72rem;
 }
 
@@ -204,6 +204,8 @@ body {
 .tooltip .t-years { color: #666; }
 .tooltip .t-city { color: #c8860a; font-size: 0.72rem; margin-top: 2px; }
 .tooltip .t-family { color: #7b5ea7; font-size: 0.72rem; margin-top: 2px; }
+.tooltip .t-queer { color: #e079a0; font-size: 0.72rem; margin-top: 2px; }
+.tooltip .t-frequent { color: #3cb371; font-size: 0.72rem; margin-top: 2px; }
 
 /* Buttons */
 .btn {
